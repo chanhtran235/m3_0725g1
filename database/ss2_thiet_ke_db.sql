@@ -153,4 +153,152 @@ join class c on s.class_id = c.id
 where c.name ='c1121g1'
 order by s.score desc, s.name asc;
 
+-- Bài 4
+-- Hiển thị danh sách các lớp đã có học viên và cho biết số lượng của mỗi lớp
+select c.name as class_name, count(s.id) as sl
+from student s 
+join class c on s.class_id = c.id
+group by c.id;
+-- lấy ra danh sách học viên và giáo viên
+select name, birthday from student
+union all
+select name, birthday from instructor;
+
+-- tạo full join
+select *
+from student s 
+left join class c on s.class_id = c.id
+union
+select *
+from student s 
+right join class c on s.class_id = c.id;
+
+-- lấy ra 3 học viên có điểm cao nhất của trung tâmember
+select * from student order by score desc limit 3,3;
+
+-- lấy ra các học viên có điểm cao nhất của trung tâm
+select * from student where score = (select max(score) from student);
+select * from student where score <=all (select score from student);
+select * from student where score < any (select score from student);
+
+
+-- Tìm ra những giảng viên chưa từng được phân công giảng dạy
+
+-- sub query
+select * 
+from instructor i
+where i.id not in (select distinct instructor_id from instructor_class);
+
+select * 
+from instructor i where not exists
+ (select * from instructor_class ic where ic.instructor_id = i.id);
+
+-- join bảng
+select * 
+from instructor i
+left join instructor_class ic on i.id=ic.instructor_id
+where ic.instructor_id is null;
+
+select * from instructor i where i.id not in
+(select distinct instructor_id from instructor_class);
+
+select * from instructor i where not exists 
+		(select * from instructor_class ic where i.id=ic.instructor_id);
+
+-- tạo index
+explain select * from customers where city ='lyon';
+select count(*) from customers where city ='lyon';
+select * from customers;
+
+create index i_city on customers(city);
+alter table customers add index i_country(country);
+
+drop index i_city on customers;
+alter table customers drop index i_country;
+
+-- view
+create view w_student as
+select s.*,c.name as class_name 
+from student s 
+join class c on s.class_id = c.id;
+-- sử dụng view
+select * from w_student;
+update w_student set score =5 where id =2;
+
+-- sp không tham số
+delimiter //
+create procedure get_all_student()
+begin
+select s.*,c.name as class_name 
+from student s 
+join class c on s.class_id = c.id;
+end //
+delimiter ;
+call get_all_student();
+
+delimiter //
+create procedure get_student_by_id(IN p_id int)
+begin
+select s.*,xep_loai(s.score) as xep_loai,c.name as class_name 
+from student s 
+join class c on s.class_id = c.id
+where s.id = p_id;
+end //
+delimiter ;
+
+call get_student_by_id(6);
+
+-- function
+delimiter //
+create function xep_loai(p_score int)
+returns varchar(20)
+deterministic
+begin
+declare loai varchar(20);
+if p_score>=8 then
+set loai ='giỏi';
+elseif p_score>=7 then
+set loai ='khá';
+elseif p_score>=5 then
+set loai ='trung bình';
+else
+set loai ='yếu';
+end if;
+return loai;
+end //
+delimiter ;
+
+
+
+-- 
+-- 5 tạo trigger tự động lưu lại lịch sử thay đổi điểm của sinh viên
+ select * from student;
+ select * from jame;
+
+-- tạo bảng để ghi log
+create table `history`(
+id int auto_increment primary key,
+name varchar(50),
+old_point int,
+new_point int,
+update_day date
+);
+-- tạo trigger
+DELIMITER //
+CREATE TRIGGER tr_history 
+AFTER UPDATE ON student
+FOR EACH ROW
+BEGIN
+insert into `history`(`name`, old_point, new_point, update_day) 
+values ( old.`name`, old.`score`,new.`score`,now());
+END //
+DELIMITER ;
+
+select * from history;
+select * from student;
+
+
+
+        
+        
 
