@@ -24,6 +24,8 @@
         <th>Gender</th>
         <th>Score</th>
         <th>Rank</th>
+        <th>Class name</th>
+
     </tr>
     <c:forEach var="student" items="${studentList}" varStatus="status">
         <tr>
@@ -51,6 +53,7 @@
                     </c:otherwise>
                 </c:choose>
             </td>
+            <td>${student.getClassName()}</td>
         </tr>
     </c:forEach>
 

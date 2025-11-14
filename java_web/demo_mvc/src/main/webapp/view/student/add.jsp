@@ -17,11 +17,18 @@
 <c:import url="../layout/my_nabar.jsp"/>
 <h2> Add new student</h2>
 <form action="/students?action=add" method="post">
-    <input name="id" placeholder="Enter id"><br>
+<%--    <input name="id" placeholder="Enter id"><br>--%>
     <input name="name" placeholder="Enter name"><br>
     <input type="radio" name="gender" value="0">Female
     <input type="radio" name="gender" value="1">Male<br>
     <input  name="score" placeholder="Enter score">Score<br>
+    <select name="classId">
+        <option>-----Chọn lớp ------- </option>
+        <c:forEach items="${classList}" var="cls">
+            <option value="${cls.getId()}">${cls.getName()}</option>
+        </c:forEach>
+
+    </select>
     <button>Save</button>
 </form>
 </body>

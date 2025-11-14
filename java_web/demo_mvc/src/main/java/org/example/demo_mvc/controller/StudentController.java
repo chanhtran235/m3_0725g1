@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.demo_mvc.entity.Student;
+import org.example.demo_mvc.service.ClassService;
+import org.example.demo_mvc.service.IClassService;
 import org.example.demo_mvc.service.IStudentService;
 import org.example.demo_mvc.service.StudentService;
 
@@ -14,6 +16,7 @@ import java.io.IOException;
 @WebServlet(name = "studentController", value = "/students")
 public class StudentController extends HttpServlet {
     private IStudentService studentService = new StudentService();
+    private IClassService classService = new ClassService();
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String action = req.getParameter("action");
@@ -45,6 +48,7 @@ public class StudentController extends HttpServlet {
 
     private void showFormAdd(HttpServletRequest req, HttpServletResponse resp) {
         req.setAttribute("studentList", studentService.findAll());
+        req.setAttribute("classList", classService.findAll());
         try {
             req.getRequestDispatcher("/view/student/add.jsp").forward(req,resp);
         } catch (Exception e) {
@@ -72,11 +76,11 @@ public class StudentController extends HttpServlet {
     }
 
     private void save(HttpServletRequest req, HttpServletResponse resp) {
-        int id = Integer.parseInt(req.getParameter("id"));
         String name = req.getParameter("name");
         boolean gender = Boolean.parseBoolean(req.getParameter("gender"));
         float score = Float.parseFloat(req.getParameter("score"));
-        Student student = new Student(id,name,gender,score);
+        int classId = Integer.parseInt(req.getParameter("classId"));
+        Student student = new Student(name,gender,score,classId);
         studentService.add(student);
         showList(req,resp);
     }
