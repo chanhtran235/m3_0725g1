@@ -6,16 +6,14 @@ import org.example.demo_mvc.connect_db.ConnectDB;
 import org.example.demo_mvc.dto.StudentDto;
 import org.example.demo_mvc.entity.Student;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StudentRepository implements IStudentRepository{
     private final String SELECT_ALL ="select s.*,c.name as class_name from student s join class c on s.class_id = c.id;";
     private final String INSERT_INTO ="insert into student(name,gender,score,class_id) values(?,?,?,?);";
+    private final String DELETE_BY_ID ="call delete_by_id(?);";
     @Override
     public List<StudentDto> findAll() {
         List<StudentDto> studentList = new ArrayList<>();
@@ -49,6 +47,20 @@ public class StudentRepository implements IStudentRepository{
             preparedStatement.setInt(4,student.getClassId());
            int effectRow = preparedStatement.executeUpdate();
            return effectRow ==1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println("lỗi lấy dữ liệu");
+        }
+        return false;
+    }
+
+    @Override
+    public boolean deleteById(int id) {
+        try (Connection connection = ConnectDB.getConnectDB();){
+            CallableStatement callableStatement = connection.prepareCall(DELETE_BY_ID);
+            callableStatement.setInt(1,id);
+            int effectRow = callableStatement.executeUpdate();
+            return effectRow ==1;
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("lỗi lấy dữ liệu");

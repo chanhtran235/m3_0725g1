@@ -9,4 +9,5 @@ import java.util.List;
 public interface IStudentRepository {
     List<StudentDto> findAll();
     boolean add(Student student);
+    boolean deleteById(int id);
 }
